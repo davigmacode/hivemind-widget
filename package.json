@@ -1,9 +1,10 @@
 {
   "name": "hivemind-widget",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Web component widget for hivemind",
   "author": "Irfan Vigma Taufik <davigmacode@gmail.com>",
   "license": "MIT",
+  "main": "./dist/bundle.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "postinstall": "npm run build",
