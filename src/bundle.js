@@ -13,5 +13,7 @@ Vue.use(VueCustomElement)
 // import and register your component(s)
 import HivemindContent from './components/Content.vue'
 import HivemindSummary from './components/Summary.vue'
+import HivemindTrend from './components/Trend.vue'
 Vue.customElement('hivemind-content', HivemindContent)
 Vue.customElement('hivemind-summary', HivemindSummary)
+Vue.customElement('hivemind-trend', HivemindTrend)

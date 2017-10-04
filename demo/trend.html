@@ -1,6 +1,6 @@
 <html>
   <head>
-    <title>Summary - Hivemind Widget</title>
+    <title>Trend - Hivemind Widget</title>
     <style>
       .widget {
         box-sizing: border-box;
@@ -14,26 +14,27 @@
   <body>
     <div class="widgets">
       <div class="widget">
-        <hivemind-summary
+        <hivemind-trend
           hiveid="59099db7d8e7da00b8cc1c2d"
-          interval="weekly"></hivemind-summary>
+          interval="weekly"
+          engagement="likes"></hivemind-trend>
       </div>
       <div class="widget">
-        <hivemind-summary
+        <hivemind-trend
           hiveid="5909a025d8e7da00b8cc1c30"
-          interval="monthly"></hivemind-summary>
+          interval="weekly"
+          engagement="comments"></hivemind-trend>
       </div>
       <div class="widget">
-        <hivemind-summary
+        <hivemind-trend
           hiveid="590aa6ccd8e7da00b8cc1c3c"
-          interval="none"></hivemind-summary>
+          interval="monthly"
+          engagement="shares"></hivemind-trend>
       </div>
     </div>
 
     <script>window.hivemind = { apikey: 'f303f607-edc8-464a-9782-1aba7855677f' }</script>
-    <script src="https://unpkg.com/vue-chartjs/dist/vue-chartjs.full.min.js"></script>
-    <script src="https://unpkg.com/chartjs-plugin-datalabels@0.1.0/dist/chartjs-plugin-datalabels.js"></script>
     <script src="https://unpkg.com/document-register-element@1.7.0/build/document-register-element.js"></script>
-    <script src="https://unpkg.com/hivemind-widget@1.0.0/dist/summary.js"></script>
+    <script src="https://unpkg.com/hivemind-widget@1.0.0/dist/trend.js"></script>
   </body>
 </html>

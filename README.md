@@ -1,4 +1,4 @@
-# Vue Custom Element Bundler
+# Hivemind Widget
 
 Example using Rollup to bundle one or many Vue.js components into a single .js file that **can be used in any HTML/JS application.**
 

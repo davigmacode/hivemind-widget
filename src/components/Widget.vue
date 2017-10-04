@@ -25,14 +25,25 @@
         error: ''
       }
     },
+    computed: {
+      hivemind () {
+        return window.hivemind || {}
+      }
+    },
     methods: {
       authenticate () {
+        let apikey = this.apikey || this.hivemind.apikey
+
+        if (!apikey) {
+          return Promise.reject({message: 'API key is required'})
+        }
+
         return this.$api.request({
           method: 'post',
           url: 'auth/login',
           data: {
             strategy: 'apikey',
-            apikey: this.apikey
+            apikey: apikey
           }
         })
       },

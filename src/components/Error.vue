@@ -18,6 +18,7 @@
 
 <style scoped>
   .error-message {
+    color: #78909C;
     font-weight: bold;
   }
 </style>

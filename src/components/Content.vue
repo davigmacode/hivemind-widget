@@ -5,7 +5,7 @@
         <spinner :spacing="10" :line-fg-color="config.color" message="loading"></spinner>
       </div>
       <div class="hivemind-content" v-else>
-        <error v-if="error" message="error"></error>
+        <error v-if="error" :message="error"></error>
         <ul class="hivemind-posts" v-else>
           <li class="hivemind-post" v-for="post in items" :key="post._id">
             <div class="hivemind-post-thumb" v-if="config.thumb === 'left'">
@@ -221,8 +221,8 @@
       this.authenticate().then((response) => {
         this.fetchContents(response.data.accessToken)
       }).catch((error) => {
-        this.loading = false
         this.error = error.message
+        this.loading = false
       })
     }
   }

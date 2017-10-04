@@ -6,9 +6,13 @@
       </div>
       <div class="hivemind-content" v-else>
         <error v-if="error" :message="error"></error>
-        <div class="hivemind-chart" v-else>
-          <chart-total v-if="!summary.isInterval" :data="summary.data" :title="options.title"></chart-total>
-          <chart-interval v-else :data="summary.data" :title="options.title" :interval="summary.type"></chart-interval>
+        <div class="hivemind-trend" v-else>
+          <trend
+            :data="trend.data"
+            :gradient="trend.gradient"
+            :auto-draw="trend.autodraw"
+            :smooth="trend.smooth">
+          </trend>
         </div>
       </div>
     </div>
@@ -22,14 +26,12 @@
 
 <script>
   import Widget from './Widget.vue'
-  import ChartTotal from './ChartTotal.js'
-  import ChartInterval from './ChartInterval.js'
+  import Trend from 'vuetrend'
 
   export default {
     extends: Widget,
     components: {
-      ChartTotal,
-      ChartInterval
+      Trend
     },
     props: {
       interval: {
@@ -37,41 +39,20 @@
         required: false,
         default: 'none'
       },
-      title: {
+      engagement: {
         type: String,
         required: false,
         default: ''
-      },
-      width: {
-        type: String,
-        required: false,
-        default: '350px'
-      },
-      height: {
-        type: String,
-        required: false,
-        default: '350px'
       }
     },
     data () {
       return {
         items: [],
-        summary: {}
-      }
-    },
-    computed: {
-      styles () {
-        return {
-          position: 'relative',
-          width: this.width || 'auto',
-          height: this.height || 'auto'
-        }
-      },
-      options () {
-        return {
-          title: this.title,
-          width: this.width,
-          height: this.height
+        trend: {
+          data: [],
+          gradient: ['#6fa8dc', '#42b983', '#2c3e50'],
+          autodraw: true,
+          smooth: true
         }
       }
     },
@@ -82,16 +63,22 @@
           day: 'day',
           week: 'week',
           month: 'month',
-          dayly: 'day',
+          daily: 'day',
           weekly: 'week',
-          monthly: 'month',
-          none: 'total',
-          total: 'total'
+          monthly: 'month'
         }
 
-        if (intervals[type] === undefined) {
+        // interval parameter validation
+        if (intervals[type] == undefined) {
           this.error = 'Invalid value for "interval" property'
-          return false
+          return true
+        }
+
+        // engagement parameter validation
+        let engagements = ['likes', 'comments', 'shares', 'clicks', 'love', 'wow', 'haha', 'sad', 'angry']
+        if (engagements.indexOf(this.engagement) === -1) {
+          this.error = 'Invalid value for "engagement" property'
+          return true
         }
 
         let filter = {
@@ -108,11 +95,14 @@
             authorization: token
           }
         }).then((response) => {
-          this.summary = {
-            type: intervals[type],
-            data: response.data.summary,
-            isInterval: intervals[type] !== 'total'
+          let trend = []
+          let summaries = response.data.summary
+          for (let i = 0; i < summaries.length; i++) {
+            let summary = summaries[i]
+            trend.push(summary[this.engagement].sum)
           }
+
+          this.$set(this.trend, 'data', trend)
         }).catch((error) => {
           this.error = error.message
         }).then(() => {
