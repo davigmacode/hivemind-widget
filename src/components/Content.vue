@@ -67,7 +67,7 @@
     </div>
     <div class="hivemind-brand">
       <a href="https://beta.hivemind.id" target="_blank">
-        <img src="../img/powered.gif" alt="powered by hivemind.id">
+        <img src="https://unpkg.com/hivemind-widget/img/powered.gif" alt="powered by hivemind.id">
       </a>
     </div>
   </div>
