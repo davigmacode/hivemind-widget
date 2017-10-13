@@ -1,8 +1,6 @@
 import Vue from 'vue'
-import Moment from 'moment'
 import Currency from './libraries/currency'
 
-Vue.prototype.$moment = Vue.moment = Moment
 Vue.prototype.$currency = Vue.currency = Currency
 Vue.filter('currency', Currency)
 

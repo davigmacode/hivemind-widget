@@ -67,7 +67,7 @@ export default {
 
       for (let i = 0; i < summaries.length; i++) {
         let summary = summaries[i]
-        result.labels.push(app.$moment(summary.key).format(dateFormat))
+        result.labels.push(summary.key_as_string)
 
         for (let j = 0; j < keys.length; j++) {
           let key = keys[j]

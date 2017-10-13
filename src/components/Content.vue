@@ -132,7 +132,8 @@
     methods: {
       fetchContents (token) {
         let filter = {
-          $board: this.hiveid
+          $board: this.hiveid,
+          $dateformat: this.datetime || 'st'
         }
 
         if (this.limit) {
@@ -155,14 +156,6 @@
         })
       },
       fillContents (posts) {
-        let dateformat = this.datetime || 'st'
-        let dateformats = {
-          sd: 'MMM Do YYYY',
-          ld: 'dddd, MMM Do YYYY',
-          st: 'MMM Do YYYY, h:mm a',
-          lt: 'dddd, MMM Do YYYY, h:mm a'
-        }
-
         // format posts data
         for (let i = 0; i < posts.length; i++) {
           let post = posts[i]
@@ -171,14 +164,6 @@
           post.thumb = 'https://via.placeholder.com/300?text=not%20found'
           if (post.picture) {
             post.thumb = post.picture
-          }
-
-          // format datetime
-          if (dateformat === 'rv') {
-            post.created_time = this.$moment.unix(post.created_time_unix).fromNow()
-          } else {
-            let df = dateformats[dateformat]
-            post.created_time = this.$moment.unix(post.created_time_unix).format(df)
           }
 
           // format title and icon
