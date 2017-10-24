@@ -1,4 +1,5 @@
 import Vue from 'vue'
+import 'document-register-element'
 
 // include vue-custom-element plugin to Vue
 import VueCustomElement from 'vue-custom-element'

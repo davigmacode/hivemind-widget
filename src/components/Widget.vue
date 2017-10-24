@@ -8,34 +8,68 @@
       Error,
       Spinner
     },
-    props: {
-      apikey: {
-        type: String,
-        required: true
-      },
-      hiveid: {
-        type: String,
-        required: true
-      }
-    },
+    props: ['apikey', 'hiveid', 'title'],
     data () {
       return {
         $api: null,
         loading: true,
-        error: ''
+        error: '',
+        brand: {
+          url: 'https://beta.hivemind.id',
+          img: 'https://unpkg.com/hivemind-widget/img/powered.gif',
+          alt: 'powered by hivemind.id',
+          target: '_blank'
+        }
       }
     },
     computed: {
-      hivemind () {
-        return window.hivemind || {}
+      settings () {
+        let defaults = {
+          content: {
+            limit: 5,
+            column: 1,
+            thumb: 'hidden',
+            datetime: 'rv',
+            engagement: 'hidden',
+            overflow: 'display',
+            target: '_blank',
+            optimizer: 'yes'
+          },
+          summary: {
+            interval: 'none'
+          },
+          trend: {
+            interval: 'daily',
+            engagement: 'basic'
+          }
+        }
+
+        let type = this.$options.name
+        let globals = window.hivemind || {}
+        let result = globals[type] || {}
+        result.apikey = this.apikey || globals.apikey
+        result.hiveid = this.hiveid || globals.hiveid
+
+        let props = this.$props
+        props = Object.assign({}, ...Object.entries(props).map(([k, v]) => (v !== undefined && {[k]: v})))
+
+        return Object.assign({}, defaults[type], result, props)
       }
     },
     methods: {
       authenticate () {
-        let apikey = this.apikey || this.hivemind.apikey
+        this.loading = true
+        this.error = ''
+
+        let apikey = this.settings.apikey
+        let hiveid = this.settings.hiveid
 
         if (!apikey) {
           return Promise.reject({message: 'API key is required'})
+        }
+
+        if (!hiveid) {
+          return Promise.reject({message: 'Hive Id is required'})
         }
 
         return this.$api.request({
@@ -46,44 +80,43 @@
             apikey: apikey
           }
         })
-      },
-      preProcessing () {
-        this.loading = true
-        this.error = ''
       }
     },
     created () {
       this.$api = Api
-      this.preProcessing()
     }
   }
 </script>
 
 <style>
-  .hivemind-body {
+  .hivemind-header {
     position: relative;
-    min-height: 250px;
-    display: flex;
-    justify-content: center;
-    flex-direction: column;
+  }
+  .hivemind-header .hivemind-brand {
+    float: right;
+    padding: 0;
+  }
+  .hivemind-title {
+    margin: 12px 0;
+  }
+  .hivemind-body {
+    display: block;
+    position: relative;
     text-align: center;
-    background: #ECEFF1;
   }
   .hivemind-brand {
     text-align: center;
     padding: 15px 0 0;
+    display: block;
   }
   .hivemind-brand img {
     max-width: 100%;
   }
-  .hivemind-post-empty {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 24px;
-    font-weight: bold;
-    text-align: center;
-    opacity: 0.5;
+  .hivemind-loading {
+    min-height: 250px;
+    background: #ECEFF1;
+    justify-content: center;
+    flex-direction: column;
+    display: flex;
   }
 </style>

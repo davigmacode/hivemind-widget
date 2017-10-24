@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import Currency from './libraries/currency'
+import 'document-register-element'
 
 Vue.prototype.$currency = Vue.currency = Currency
 Vue.filter('currency', Currency)

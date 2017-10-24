@@ -1,24 +1,37 @@
 <template>
   <div class="hivemind-widget">
+    <div class="hivemind-header" v-if="settings.title">
+      <a class="hivemind-brand" :href="brand.url" :target="brand.target">
+        <img :src="brand.img" :alt="brand.alt">
+      </a>
+      <h3 class="hivemind-title" v-text="settings.title"></h3>
+    </div>
     <div class="hivemind-body">
       <div class="hivemind-loading" v-if="loading">
         <spinner :spacing="10" message="loading"></spinner>
       </div>
       <div class="hivemind-content" v-else>
         <error v-if="error" :message="error"></error>
-        <div class="hivemind-trend" v-else>
-          <trend
-            :data="trend.data"
-            :gradient="trend.gradient"
-            :auto-draw="trend.autodraw"
-            :smooth="trend.smooth">
-          </trend>
-        </div>
+        <table class="hivemind-trend" v-else>
+          <tr v-for="(data, key) in items" :key="key">
+            <td class="hivemind-trend-label" v-text="key"></td>
+            <td class="hivemind-trend-data">
+              <trend
+                :data="data"
+                :gradient="trend.gradient"
+                :auto-draw="trend.autodraw"
+                :stroke-width="trend.strokeWidth"
+                :stroke-linecap="trend.strokeLinecap"
+                :smooth="trend.smooth">
+              </trend>
+            </td>
+          </tr>
+        </table>
       </div>
     </div>
-    <div class="hivemind-brand">
-      <a href="https://beta.hivemind.id" target="_blank">
-        <img src="https://unpkg.com/hivemind-widget/img/powered.gif" alt="powered by hivemind.id">
+    <div class="hivemind-footer" v-if="!settings.title">
+      <a class="hivemind-brand" :href="brand.url" :target="brand.target">
+        <img :src="brand.img" :alt="brand.alt">
       </a>
     </div>
   </div>
@@ -33,24 +46,15 @@
     components: {
       Trend
     },
-    props: {
-      interval: {
-        type: String,
-        required: false,
-        default: 'none'
-      },
-      engagement: {
-        type: String,
-        required: false,
-        default: ''
-      }
-    },
+    props: ['interval', 'engagement'],
     data () {
       return {
-        items: [],
+        items: {},
         trend: {
           data: [],
           gradient: ['#6fa8dc', '#42b983', '#2c3e50'],
+          strokeLinecap: 'round',
+          strokeWidth: 7,
           autodraw: true,
           smooth: true
         }
@@ -58,7 +62,9 @@
     },
     methods: {
       fetchContents (token) {
-        let type = this.interval
+        let hiveid = this.settings.hiveid
+        let engagement = this.settings.engagement
+        let interval = this.settings.interval
         let intervals = {
           day: 'day',
           week: 'week',
@@ -67,23 +73,28 @@
           weekly: 'week',
           monthly: 'month'
         }
+        let engagements = {
+          basic: ['likes', 'comments', 'shares', 'clicks'],
+          reactions: ['love', 'wow', 'haha', 'sad', 'angry']
+        }
 
         // interval parameter validation
-        if (intervals[type] == undefined) {
+        if (!intervals[interval]) {
           this.error = 'Invalid value for "interval" property'
+          this.loading = false
           return true
         }
 
         // engagement parameter validation
-        let engagements = ['likes', 'comments', 'shares', 'clicks', 'love', 'wow', 'haha', 'sad', 'angry']
-        if (engagements.indexOf(this.engagement) === -1) {
+        if (!engagements[engagement]) {
           this.error = 'Invalid value for "engagement" property'
+          this.loading = false
           return true
         }
 
         let filter = {
-          $board: this.hiveid,
-          $summary: intervals[type],
+          $board: hiveid,
+          $summary: intervals[interval],
           $limit: 0
         }
 
@@ -95,14 +106,22 @@
             authorization: token
           }
         }).then((response) => {
-          let trend = []
+          let trend = {}
           let summaries = response.data.summary
+          engagements = engagements[engagement]
+
           for (let i = 0; i < summaries.length; i++) {
             let summary = summaries[i]
-            trend.push(summary[this.engagement].sum)
+            for (let j = 0; j < engagements.length; j++) {
+              let e = engagements[j]
+              if (!trend[e]) {
+                trend[e] = []
+              }
+              trend[e].push(summary[e].sum)
+            }
           }
 
-          this.$set(this.trend, 'data', trend)
+          this.$set(this, 'items', trend)
         }).catch((error) => {
           this.error = error.message
         }).then(() => {
@@ -111,7 +130,6 @@
       }
     },
     mounted () {
-      this.preProcessing()
       this.authenticate().then((response) => {
         this.fetchContents(response.data.accessToken)
       }).catch((error) => {
@@ -123,7 +141,24 @@
 </script>
 
 <style scoped>
-  .hivemind-chart {
-    background: #fff;
+  .hivemind-trend {
+    width: 100%;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    padding: 10px 20px;
+  }
+  .hivemind-trend td {
+    padding: 10px 0;
+  }
+  .hivemind-trend svg {
+    width: auto;
+  }
+  .hivemind-trend-label {
+    padding-left: 25px;
+    text-transform: capitalize;
+    text-align: left;
+  }
+  .hivemind-trend-data {
+    text-align: right;
   }
 </style>

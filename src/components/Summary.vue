@@ -1,5 +1,11 @@
 <template>
   <div class="hivemind-widget">
+    <div class="hivemind-header" v-if="settings.title">
+      <a class="hivemind-brand" :href="brand.url" :target="brand.target">
+        <img :src="brand.img" :alt="brand.alt">
+      </a>
+      <h3 class="hivemind-title" v-text="settings.title"></h3>
+    </div>
     <div class="hivemind-body">
       <div class="hivemind-loading" v-if="loading">
         <spinner :spacing="10" message="loading"></spinner>
@@ -7,14 +13,14 @@
       <div class="hivemind-content" v-else>
         <error v-if="error" :message="error"></error>
         <div class="hivemind-chart" v-else>
-          <chart-total v-if="!summary.isInterval" :data="summary.data" :title="options.title"></chart-total>
-          <chart-interval v-else :data="summary.data" :title="options.title" :interval="summary.type"></chart-interval>
+          <chart-total v-if="!summary.isInterval" :data="summary.data"></chart-total>
+          <chart-interval v-else :data="summary.data" :interval="summary.type"></chart-interval>
         </div>
       </div>
     </div>
-    <div class="hivemind-brand">
-      <a href="https://beta.hivemind.id" target="_blank">
-        <img src="https://unpkg.com/hivemind-widget/img/powered.gif" alt="powered by hivemind.id">
+    <div class="hivemind-footer" v-if="!settings.title">
+      <a class="hivemind-brand" :href="brand.url" :target="brand.target">
+        <img :src="brand.img" :alt="brand.alt">
       </a>
     </div>
   </div>
@@ -31,53 +37,16 @@
       ChartTotal,
       ChartInterval
     },
-    props: {
-      interval: {
-        type: String,
-        required: false,
-        default: 'none'
-      },
-      title: {
-        type: String,
-        required: false,
-        default: ''
-      },
-      width: {
-        type: String,
-        required: false,
-        default: '350px'
-      },
-      height: {
-        type: String,
-        required: false,
-        default: '350px'
-      }
-    },
+    props: ['interval'],
     data () {
       return {
         items: [],
         summary: {}
       }
     },
-    computed: {
-      styles () {
-        return {
-          position: 'relative',
-          width: this.width || 'auto',
-          height: this.height || 'auto'
-        }
-      },
-      options () {
-        return {
-          title: this.title,
-          width: this.width,
-          height: this.height
-        }
-      }
-    },
     methods: {
       fetchContents (token) {
-        let type = this.interval
+        let type = this.settings.interval
         let intervals = {
           day: 'day',
           week: 'week',
@@ -95,7 +64,7 @@
         }
 
         let filter = {
-          $board: this.hiveid,
+          $board: this.settings.hiveid,
           $summary: intervals[type],
           $limit: 0
         }
@@ -121,7 +90,6 @@
       }
     },
     mounted () {
-      this.preProcessing()
       this.authenticate().then((response) => {
         this.fetchContents(response.data.accessToken)
       }).catch((error) => {

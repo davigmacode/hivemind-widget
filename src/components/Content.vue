@@ -1,24 +1,37 @@
 <template>
   <div class="hivemind-widget">
+    <div class="hivemind-header" v-if="config.title">
+      <a class="hivemind-brand" :href="brand.url" :target="brand.target">
+        <img :src="brand.img" :alt="brand.alt">
+      </a>
+      <h3 class="hivemind-title" v-text="config.title"></h3>
+    </div>
     <div class="hivemind-body">
       <div class="hivemind-loading" v-if="loading">
         <spinner :spacing="10" :line-fg-color="config.color" message="loading"></spinner>
       </div>
       <div class="hivemind-content" v-else>
         <error v-if="error" :message="error"></error>
-        <ul class="hivemind-posts" v-else>
-          <li class="hivemind-post" v-for="post in items" :key="post._id">
-            <div class="hivemind-post-thumb" v-if="config.thumb === 'left'">
-              <img :src="post.thumb" @load="thumbLoaded($event, post)">
+        <ul :class="config.post.class" v-else>
+          <li class="hivemind-post" :style="config.post.style" v-for="post in items" :key="post._id">
+            <div class="hivemind-post-thumb" v-if="config.thumb.enabled">
+              <a
+                :target="config.target"
+                :href="post.link"
+                :title="post.title">
+                <img :src="post.thumb" @load="thumbLoaded" @error="thumbError">
+              </a>
             </div>
             <div class="hivemind-post-content">
-              <div class="hivemind-post-date">{{ post.created_time }}</div>
+              <div class="hivemind-post-date" v-if="config.datetime.enabled">
+                {{ post.created_time }}
+              </div>
               <a
                 class="hivemind-post-link"
-                target="_blank"
                 v-text="post.title"
                 :href="post.link"
-                :style="config.title.style"
+                :target="config.target"
+                :style="config.link.style"
                 :title="post.title"></a>
               <div class="hivemind-post-info" v-if="config.engagement === 'basic'">
                 <span class="hivemind-post-info-item" title="likes">
@@ -65,9 +78,9 @@
         </ul>
       </div>
     </div>
-    <div class="hivemind-brand">
-      <a href="https://beta.hivemind.id" target="_blank">
-        <img src="https://unpkg.com/hivemind-widget/img/powered.gif" alt="powered by hivemind.id">
+    <div class="hivemind-footer" v-if="!config.title">
+      <a class="hivemind-brand" :href="brand.url" :target="brand.target">
+        <img :src="brand.img" :alt="brand.alt">
       </a>
     </div>
   </div>
@@ -77,39 +90,9 @@
   import Widget from './Widget.vue'
 
   export default {
+    name: 'content',
     extends: Widget,
-    props: {
-      limit: {
-        type: Number,
-        required: false,
-        default: 5
-      },
-      thumb: {
-        type: String,
-        required: false,
-        default: 'hidden'
-      },
-      datetime: {
-        type: String,
-        required: false,
-        default: 'st'
-      },
-      engagement: {
-        type: String,
-        required: false,
-        default: 'basic'
-      },
-      overflow: {
-        type: String,
-        required: false,
-        default: 'hidden'
-      },
-      color: {
-        type: String,
-        required: false,
-        default: '#059B85'
-      }
-    },
+    props: ['limit', 'thumb', 'datetime', 'engagement', 'overflow', 'column', 'target', 'optimizer'],
     data () {
       return {
         items: []
@@ -117,27 +100,62 @@
     },
     computed: {
       config () {
-        return {
-          thumb: this.thumb || 'hidden',
-          engagement: this.engagement || 'basic',
-          title: {
-            style: {
-              whiteSpace: this.overflow === 'display' ? 'normal' : 'nowrap',
-              color: this.color
-            }
+        let results = this.settings
+
+        results.link = {
+          style: {
+            whiteSpace: results.overflow === 'display' ? 'normal' : 'nowrap'
           }
         }
+
+        results.thumb = {
+          value: results.thumb,
+          enabled: ['left', 'top'].indexOf(results.thumb) !== -1
+        }
+
+        if (results.thumb.enabled) {
+          if (results.thumb.value === 'left') {
+            results.thumb.placeholder = 'https://via.placeholder.com/80?text=not%20found'
+            results.thumb.error = 'https://via.placeholder.com/80?text=broken'
+          } else if (results.thumb.value === 'top') {
+            results.thumb.placeholder = 'https://via.placeholder.com/500x300?text=not%20found'
+            results.thumb.error = 'https://via.placeholder.com/500x300?text=broken'
+          }
+        }
+
+        results.column = results.column === parseInt(results.column) ? results.column : 1
+
+        results.post = {
+          class: {
+            'hivemind-posts': true,
+            'hivemind-posts-list': results.thumb.value === 'left',
+            'hivemind-posts-card': results.thumb.value === 'top',
+            'hivemind-posts-column': results.column > 1
+          },
+          style: {
+            'width': ( 100 / results.column ) + '%'
+          }
+        }
+
+        results.datetime = {
+          value: results.datetime,
+          enabled: ['sd', 'ld', 'st', 'lt', 'rv'].indexOf(results.datetime) !== -1
+        }
+
+        results.optimizer = results.optimizer === 'yes'
+
+        return results
       }
     },
     methods: {
       fetchContents (token) {
         let filter = {
-          $board: this.hiveid,
-          $dateformat: this.datetime || 'st'
+          $board: this.config.hiveid,
+          $dateformat: this.config.datetime.value
         }
 
-        if (this.limit) {
-          filter.$limit = this.limit
+        if (this.config.limit) {
+          filter.$limit = this.config.limit
         }
 
         this.$api.request({
@@ -161,9 +179,34 @@
           let post = posts[i]
 
           // format thumbnail
-          post.thumb = 'https://via.placeholder.com/300?text=not%20found'
-          if (post.picture) {
-            post.thumb = post.picture
+          if (this.config.thumb.enabled) {
+            // set image placeholder
+            post.thumb = this.config.thumb.placeholder
+
+            if (this.config.thumb.value === 'left' && post.picture) {
+              // if thumb left set thumb with fb post thumb
+              post.thumb = post.picture
+            } else if (this.config.thumb.value === 'top' && post.full_picture) {
+              let pic = post.full_picture
+              if (this.config.optimizer) {
+                let result = null
+                if (pic.indexOf('scontent.xx.fbcdn.net') >= 0) {
+                  result = pic.replace(/^\/\/|^.*?:\/\//, '')
+                  result = 'http://rsz.io/' + result + '?w=500&h=300&mode=crop'
+                } else if (pic.indexOf('external.xx.fbcdn.net') >= 0) {
+                  let url = new URL(pic)
+                  let params = new URLSearchParams(url.search.slice(1))
+                  result = params.get('url')
+                  result = result.replace(/^\/\/|^.*?:\/\//, '')
+                  result = 'http://rsz.io/' + result + '?w=500&h=300&mode=crop'
+                } else {
+                  result = this.config.thumb.placeholder
+                }
+                post.thumb = result
+              } else {
+                post.thumb = pic
+              }
+            }
           }
 
           // format title and icon
@@ -193,16 +236,20 @@
 
         this.items = posts
       },
-      thumbLoaded (e, post) {
+      thumbLoaded (e) {
         let img = e.target
         let isLoaded = img.complete && img.naturalHeight > 1
+
         if (!isLoaded) {
-          img.src = '//via.placeholder.com/130?text=broken'
+          img.src = this.config.thumb.error
         }
+      },
+      thumbError (e) {
+        let img = e.target
+        img.src = this.config.thumb.error
       }
     },
     mounted () {
-      this.preProcessing()
       this.authenticate().then((response) => {
         this.fetchContents(response.data.accessToken)
       }).catch((error) => {
@@ -220,41 +267,68 @@
     list-style: none;
     border-bottom: 1px solid #ddd;
     background-color: #fff;
+    text-align: left;
   }
   .hivemind-post {
     position: relative;
     display: block;
+    margin: 0;
     padding: 12px 10px;
     border-top: 1px solid #ddd;
     text-align: left;
+    box-sizing: border-box;
   }
   .hivemind-post:after {
     content: "";
     display: table;
     clear: both;
   }
-  .hivemind-post-thumb {
+  .hivemind-post-thumb a {
+    display: block;
+  }
+  .hivemind-post-thumb img {
+    max-width: 100%;
+  }
+  .hivemind-posts-list .hivemind-post-thumb {
     float: left;
     margin-right: 15px;
   }
-  .hivemind-post-thumb > img {
+  .hivemind-posts-list img {
     width: 65px;
     height: 65px;
     margin: 0;
   }
+  .hivemind-posts-card .hivemind-post-thumb {
+    margin-bottom: 7px;
+  }
+  .hivemind-posts-card img {
+    width: 100%;
+    max-height: 200px;
+  }
+  .hivemind-posts-column {
+    margin: 0 -10px;
+    padding: 0;
+    border: 0;
+  }
+  .hivemind-posts-column .hivemind-post {
+    display: inline-block;
+    vertical-align: top;
+    text-align: left;
+    padding: 5px 10px;
+    border: 0;
+  }
   .hivemind-post-date {
     font-size: 85%;
+    margin-bottom: 3px;
   }
   .hivemind-post-link {
     display: block;
-    margin: 3px 0 7px;
+    margin-bottom: 7px;
     max-width: 100%;
     overflow-x: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
     font-size: 100%;
-    color: #0a7a7d;
-    cursor: pointer;
     text-decoration: none;
     line-height: 1.3em;
   }
