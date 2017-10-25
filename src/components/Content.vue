@@ -1,7 +1,7 @@
 <template>
-  <div class="hivemind-widget">
+  <div :class="css.widget.class">
     <div class="hivemind-header" v-if="config.title">
-      <a class="hivemind-brand" :href="brand.url" :target="brand.target">
+      <a class="hivemind-brand" :href="brand.url" :target="brand.target" v-if="media !== 'xs'">
         <img :src="brand.img" :alt="brand.alt">
       </a>
       <h3 class="hivemind-title" v-text="config.title"></h3>
@@ -12,65 +12,65 @@
       </div>
       <div class="hivemind-content" v-else>
         <error v-if="error" :message="error"></error>
-        <ul :class="config.post.class" v-else>
-          <li class="hivemind-post" :style="config.post.style" v-for="post in items" :key="post._id">
+        <ul :class="config.posts.class" v-else>
+          <li class="hivemind-post" :style="css.post.style" v-for="item in items" :key="item._id">
             <div class="hivemind-post-thumb" v-if="config.thumb.enabled">
               <a
                 :target="config.target"
-                :href="post.link"
-                :title="post.title">
-                <img :src="post.thumb" @load="thumbLoaded" @error="thumbError">
+                :href="item.link"
+                :title="item.title">
+                <img :src="item.thumb" @load="thumbLoaded" @error="thumbError">
               </a>
             </div>
             <div class="hivemind-post-content">
               <div class="hivemind-post-date" v-if="config.datetime.enabled">
-                {{ post.created_time }}
+                {{ item.created_time }}
               </div>
               <a
                 class="hivemind-post-link"
-                v-text="post.title"
-                :href="post.link"
+                v-text="item.title"
+                :href="item.link"
                 :target="config.target"
                 :style="config.link.style"
-                :title="post.title"></a>
+                :title="item.title"></a>
               <div class="hivemind-post-info" v-if="config.engagement === 'basic'">
                 <span class="hivemind-post-info-item" title="likes">
                   <i class="material-icons">thumb_up</i>
-                  {{ post.likes | currency }}
+                  {{ item.likes | currency }}
                 </span>
                 <span class="hivemind-post-info-item" title="comments">
                   <i class="material-icons">forum</i>
-                  {{ post.comments | currency }}
+                  {{ item.comments | currency }}
                 </span>
                 <span class="hivemind-post-info-item" title="shares">
                   <i class="material-icons">share</i>
-                  {{ post.shares | currency }}
+                  {{ item.shares | currency }}
                 </span>
                 <span class="hivemind-post-info-item" title="clicks">
                   <i class="material-icons">touch_app</i>
-                  {{ post.clicks | currency }}
+                  {{ item.clicks | currency }}
                 </span>
               </div>
               <div class="hivemind-post-info" v-if="config.engagement === 'reactions'">
                 <span class="hivemind-post-info-item" title="love">
                   <i class="material-icons">favorite</i>
-                  {{ post.reactions.love | currency }}
+                  {{ item.reactions.love | currency }}
                 </span>
                 <span class="hivemind-post-info-item" title="haha">
                   <i class="material-icons">mood</i>
-                  {{ post.reactions.haha | currency }}
+                  {{ item.reactions.haha | currency }}
                 </span>
                 <span class="hivemind-post-info-item" title="wow">
                   <i class="material-icons">mood_bad</i>
-                  {{ post.reactions.wow | currency }}
+                  {{ item.reactions.wow | currency }}
                 </span>
                 <span class="hivemind-post-info-item" title="sad">
                   <i class="material-icons">sentiment_dissatisfied</i>
-                  {{ post.reactions.sad | currency }}
+                  {{ item.reactions.sad | currency }}
                 </span>
                 <span class="hivemind-post-info-item" title="angry">
                   <i class="material-icons">sentiment_very_dissatisfied</i>
-                  {{ post.reactions.angry | currency }}
+                  {{ item.reactions.angry | currency }}
                 </span>
               </div>
             </div>
@@ -78,7 +78,7 @@
         </ul>
       </div>
     </div>
-    <div class="hivemind-footer" v-if="!config.title">
+    <div class="hivemind-footer" v-if="!config.title || media === 'xs'">
       <a class="hivemind-brand" :href="brand.url" :target="brand.target">
         <img :src="brand.img" :alt="brand.alt">
       </a>
@@ -92,7 +92,20 @@
   export default {
     name: 'content',
     extends: Widget,
-    props: ['limit', 'thumb', 'datetime', 'engagement', 'overflow', 'column', 'target', 'optimizer'],
+    props: [
+      'limit',
+      'thumb',
+      'target',
+      'datetime',
+      'engagement',
+      'optimizer',
+      'overflow',
+      'columnXs',
+      'columnSm',
+      'columnMd',
+      'columnLg',
+      'column'
+    ],
     data () {
       return {
         items: []
@@ -123,17 +136,20 @@
           }
         }
 
-        results.column = results.column === parseInt(results.column) ? results.column : 1
+        results.col = {
+          df: results.column === parseInt(results.column) ? results.column : undefined,
+          xs: results.columnXs === parseInt(results.columnXs) ? results.columnXs : undefined,
+          sm: results.columnSm === parseInt(results.columnSm) ? results.columnSm : undefined,
+          md: results.columnMd === parseInt(results.columnMd) ? results.columnMd : undefined,
+          lg: results.columnLg === parseInt(results.columnLg) ? results.columnLg : undefined
+        }
 
-        results.post = {
+        results.posts = {
           class: {
             'hivemind-posts': true,
             'hivemind-posts-list': results.thumb.value === 'left',
             'hivemind-posts-card': results.thumb.value === 'top',
-            'hivemind-posts-column': results.column > 1
-          },
-          style: {
-            'width': ( 100 / results.column ) + '%'
+            'hivemind-posts-column': !!results.col.df || !!results.col.xs || !!results.col.sm || !!results.col.md || !!results.col.lg
           }
         }
 
@@ -145,6 +161,36 @@
         results.optimizer = results.optimizer === 'yes'
 
         return results
+      },
+      css () {
+        let cfg = this.config.col
+        let col = 1
+
+        switch (this.media) {
+          case 'lg':
+            col = cfg.lg || cfg.df || 1
+            break
+          case 'md':
+            col = cfg.md || cfg.lg || cfg.df || 1
+            break
+          case 'sm':
+            col = cfg.sm || cfg.md || cfg.lg || cfg.df || 1
+            break
+          case 'xs':
+            col = cfg.xs || cfg.sm || cfg.md || cfg.lg || cfg.df || 1
+            break
+        }
+
+        return {
+          widget: {
+            class: ['hivemind-widget', 'hivemind-widget-' + this.media]
+          },
+          post: {
+            style: {
+              'width': ( 100 / col ) + '%'
+            }
+          }
+        }
       }
     },
     methods: {

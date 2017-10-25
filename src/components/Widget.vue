@@ -13,6 +13,7 @@
       return {
         $api: null,
         loading: true,
+        media: 'lg',
         error: '',
         brand: {
           url: 'https://beta.hivemind.id',
@@ -57,6 +58,34 @@
       }
     },
     methods: {
+      breakpoint () {
+        let sm = 768
+        let md = 922
+        let lg = 1200
+        let mm = null
+        let cb = () => this.breakpoint()
+
+        mm = window.matchMedia(`(min-width: ${lg}px)`)
+        if (mm.matches) {
+          this.media = 'lg'
+          mm.onchange = cb
+        } else {
+          mm = window.matchMedia(`(min-width: ${md}px) and (max-width: ${lg - 1}px)`)
+          if (mm.matches) {
+            this.media = 'md'
+            mm.onchange = cb
+          } else {
+            mm = window.matchMedia(`(min-width: ${sm}px) and (max-width: ${md - 1}px)`)
+            if (mm.matches) {
+              this.media = 'sm'
+              mm.onchange = cb
+            } else {
+              this.media = 'xs'
+              mm.onchange = cb
+            }
+          }
+        }
+      },
       authenticate () {
         this.loading = true
         this.error = ''
@@ -72,6 +101,10 @@
           return Promise.reject({message: 'Hive Id is required'})
         }
 
+        // check media match
+        this.breakpoint()
+
+        // call authentication api
         return this.$api.request({
           method: 'post',
           url: 'auth/login',
@@ -104,9 +137,9 @@
     position: relative;
     text-align: center;
   }
-  .hivemind-brand {
+  .hivemind-footer {
     text-align: center;
-    padding: 15px 0 0;
+    padding: 15px 0;
     display: block;
   }
   .hivemind-brand img {
