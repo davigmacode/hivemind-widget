@@ -75,7 +75,8 @@
         }
         let engagements = {
           basic: ['likes', 'comments', 'shares', 'clicks'],
-          reactions: ['love', 'wow', 'haha', 'sad', 'angry']
+          reactions: ['love', 'wow', 'haha', 'sad', 'angry'],
+          all: ['likes', 'comments', 'shares', 'clicks', 'love', 'wow', 'haha', 'sad', 'angry']
         }
 
         // interval parameter validation
@@ -142,13 +143,24 @@
 
 <style scoped>
   .hivemind-trend {
+    display: table;
     width: 100%;
+    border: 0;
+    padding: 0;
     background-color: #fff;
-    border: 1px solid #ddd;
-    padding: 10px 20px;
+    border-collapse: collapse;
+    border-spacing: 0;
+    box-shadow: 0 1px 3px rgba(0,0,0,.2), 0 1px 1px rgba(0,0,0,.14), 0 2px 1px -1px rgba(0,0,0,.12);
+  }
+  .hivemind-trend tr {
+    border: 0;
+  }
+  .hivemind-trend tr:nth-child(2n) {
+    background-color: #f8f8f8;
   }
   .hivemind-trend td {
-    padding: 10px 0;
+    padding: 9px 15px;
+    border: 0;
   }
   .hivemind-trend svg {
     width: auto;

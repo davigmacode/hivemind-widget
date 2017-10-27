@@ -29,7 +29,7 @@
           content: {
             limit: 5,
             column: 1,
-            thumb: 'hidden',
+            thumb: 'left',
             datetime: 'rv',
             engagement: 'hidden',
             overflow: 'display',
