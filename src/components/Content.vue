@@ -75,6 +75,7 @@
               </div>
             </div>
           </li>
+          <div v-if="hikeid" :data-advs-adspot-id="hikeid" style="display:none"></div>
         </ul>
       </div>
     </div>
@@ -104,7 +105,8 @@
       'columnSm',
       'columnMd',
       'columnLg',
-      'column'
+      'column',
+      'hikeid'
     ],
     data () {
       return {
@@ -323,6 +325,7 @@
     border-top: 1px solid #ddd;
     text-align: left;
     box-sizing: border-box;
+    background: none;
   }
   .hivemind-post:after {
     content: "";
@@ -371,7 +374,7 @@
     display: block;
     margin-bottom: 7px;
     max-width: 100%;
-    overflow-x: hidden;
+    overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
     font-size: 100%;
