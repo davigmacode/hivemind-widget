@@ -1,0 +1,55 @@
+<html>
+  <head>
+    <title>Hivemind Widget</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+    <link rel="stylesheet" href="https://unpkg.com/swiper@4.0.6/dist/css/swiper.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flexboxgrid/6.3.1/flexboxgrid.min.css" />
+    <style>
+      .widgets:before,
+      .widgets:after {
+        content: "";
+        display: table;
+      }
+      .widgets:after {
+        clear: both;
+      }
+      .widgets {
+        zoom: 1; /* For IE 6/7 (trigger hasLayout) */
+        margin-bottom: 20px;
+      }
+      .widget {
+        box-sizing: border-box;
+        padding: 20px;
+        display: inline-block;
+        float: left;
+        width: 33.3%;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="widgets">
+      <div class="widget" style="width:66.6%;height:450px">
+        <hivemind-widget id="5a11578a07c38300c3eae7d6"></hivemind-widget>
+      </div>
+      <div class="widget" style="height:350px">
+        <hivemind-widget id="5a11578a07c38300c3eae7d6"></hivemind-widget>
+      </div>
+    </div>
+    <div class="widgets">
+      <div class="widget">
+        <hivemind-widget id="5a0e855485b27800c30f3f53"></hivemind-widget>
+      </div>
+      <div class="widget">
+        <hivemind-widget id="5a0f9efa85b27800c30f3f57"></hivemind-widget>
+      </div>
+      <div class="widget">
+        <hivemind-widget id="5a1054f0fc8bd800c3eee084"></hivemind-widget>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/chart.js@2.7.0/dist/Chart.min.js"></script>
+    <script src="https://unpkg.com/chartjs-plugin-datalabels@0.1.0/dist/chartjs-plugin-datalabels.min.js"></script>
+    <script src="https://unpkg.com/swiper@4.0.6/dist/js/swiper.min.js"></script>
+    <script src="../dist/widget.js"></script>
+  </body>
+</html>

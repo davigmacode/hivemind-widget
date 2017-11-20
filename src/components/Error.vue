@@ -27,5 +27,6 @@
   .error-message {
     color: #78909C;
     font-weight: bold;
+    text-align: center;
   }
 </style>

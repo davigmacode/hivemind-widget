@@ -105,7 +105,7 @@ export default {
     }
   },
   mounted () {
-    // let app = this.$root.$options
+    let app = this
     let title = this.title || false
     let options = {
       responsive: true,
@@ -158,7 +158,12 @@ export default {
       },
       tooltips: {
         enabled: true,
-        displayColors: false
+        displayColors: false,
+        callbacks: {
+          label: function (tooltipItems, data) {
+            return data.datasets[tooltipItems.datasetIndex].label + ': ' + app.$currency(tooltipItems.yLabel)
+          }
+        }
       },
       layout: {
         padding: 20
@@ -166,6 +171,17 @@ export default {
       animation: {
         animateScale: true,
         animateRotate: true
+      },
+      scales: {
+        yAxes: [
+          {
+            ticks: {
+              callback: function (label, index, labels) {
+                return app.$shortnum(label)
+              }
+            }
+          }
+        ]
       },
       plugins: {
         datalabels: {
@@ -190,7 +206,7 @@ export default {
             return value > 0
           },
           formatter: (value, context) => {
-            return this.$currency(value)
+            return app.$shortnum(value)
           }
         }
       }

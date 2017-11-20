@@ -13,5 +13,5 @@ import VueCustomElement from 'vue-custom-element'
 Vue.use(VueCustomElement)
 
 // import and register your component(s)
-import HivemindSummary from './widgets/Summary.vue'
-Vue.customElement('hivemind-summary', HivemindSummary)
+import HivemindWidget from './widgets/Widget.vue'
+Vue.customElement('hivemind-widget', HivemindWidget)

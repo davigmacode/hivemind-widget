@@ -149,7 +149,7 @@ export default {
               let preset = presets[key]
               let value = chart.data.datasets[preset.dataset].data[preset.index]
               result.push({
-                text: preset.label + ' (' + app.$currency(value) + ')',
+                text: preset.label + ' (' + app.$shortnum(value) + ')',
                 fillStyle: preset.color,
                 lineWidth: 0
               })
@@ -166,7 +166,13 @@ export default {
         text: title
       },
       tooltips: {
-        enabled: true
+        enabled: true,
+        callbacks: {
+          label: function (tooltipItems, data) {
+            let val = data.datasets[tooltipItems.datasetIndex].data[tooltipItems.index]
+            return ' ' + data.labels[tooltipItems.index] + ': ' + app.$currency(val)
+          }
+        }
       },
       layout: {
         padding: 10

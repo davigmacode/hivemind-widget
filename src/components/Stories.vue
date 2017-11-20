@@ -1,121 +1,82 @@
 <template>
-  <div :class="css.widget.class">
-    <div class="hivemind-header" v-if="config.title">
-      <a class="hivemind-brand" :href="brand.url" :target="brand.target" v-if="media !== 'xs'">
-        <img :src="brand.img" :alt="brand.alt">
-      </a>
-      <h3 class="hivemind-title" v-text="config.title"></h3>
-    </div>
-    <div class="hivemind-body">
-      <div class="hivemind-loading" v-if="loading">
-        <spinner :spacing="10" :line-fg-color="config.color" message="loading"></spinner>
+  <ul :class="config.posts.class">
+    <li class="hivemind-post" :style="css.post.style" v-for="item in items" :key="item._id">
+      <div class="hivemind-post-thumb" v-if="config.thumb.enabled">
+        <a
+          :target="config.target"
+          :href="item.link">
+          <img :src="item.thumb" @load="thumbLoaded" @error="thumbError">
+        </a>
       </div>
-      <div class="hivemind-content" v-else>
-        <error v-if="error" :message="error"></error>
-        <ul :class="config.posts.class" v-else>
-          <li class="hivemind-post" :style="css.post.style" v-for="item in items" :key="item._id">
-            <div class="hivemind-post-thumb" v-if="config.thumb.enabled">
-              <a
-                :target="config.target"
-                :href="item.link"
-                :title="item.title">
-                <img :src="item.thumb" @load="thumbLoaded" @error="thumbError">
-              </a>
-            </div>
-            <div class="hivemind-post-content">
-              <div class="hivemind-post-date" v-if="config.datetime.enabled">
-                {{ item.created_time }}
-              </div>
-              <a
-                class="hivemind-post-link"
-                v-text="item.title"
-                :href="item.link"
-                :target="config.target"
-                :style="config.link.style"
-                :title="item.title"></a>
-              <div class="hivemind-post-info" v-if="config.engagement === 'basic'">
-                <span class="hivemind-post-info-item" title="likes">
-                  <i class="material-icons">thumb_up</i>
-                  {{ item.likes | currency }}
-                </span>
-                <span class="hivemind-post-info-item" title="comments">
-                  <i class="material-icons">forum</i>
-                  {{ item.comments | currency }}
-                </span>
-                <span class="hivemind-post-info-item" title="shares">
-                  <i class="material-icons">share</i>
-                  {{ item.shares | currency }}
-                </span>
-                <span class="hivemind-post-info-item" title="clicks">
-                  <i class="material-icons">touch_app</i>
-                  {{ item.clicks | currency }}
-                </span>
-              </div>
-              <div class="hivemind-post-info" v-if="config.engagement === 'reactions'">
-                <span class="hivemind-post-info-item" title="love">
-                  <i class="material-icons">favorite</i>
-                  {{ item.reactions.love | currency }}
-                </span>
-                <span class="hivemind-post-info-item" title="haha">
-                  <i class="material-icons">mood</i>
-                  {{ item.reactions.haha | currency }}
-                </span>
-                <span class="hivemind-post-info-item" title="wow">
-                  <i class="material-icons">mood_bad</i>
-                  {{ item.reactions.wow | currency }}
-                </span>
-                <span class="hivemind-post-info-item" title="sad">
-                  <i class="material-icons">sentiment_dissatisfied</i>
-                  {{ item.reactions.sad | currency }}
-                </span>
-                <span class="hivemind-post-info-item" title="angry">
-                  <i class="material-icons">sentiment_very_dissatisfied</i>
-                  {{ item.reactions.angry | currency }}
-                </span>
-              </div>
-            </div>
-          </li>
-          <div v-if="hikeid" :data-advs-adspot-id="hikeid" style="display:none"></div>
-        </ul>
+      <div class="hivemind-post-content">
+        <div class="hivemind-post-date" v-if="config.datetime.enabled && config.datetime.position === 'top'">
+          {{ item.created_time }}
+        </div>
+        <a
+          class="hivemind-post-link"
+          v-text="item.title"
+          :href="item.link"
+          :target="config.target"
+          :style="config.link.style"></a>
+        <div class="hivemind-post-date" v-if="config.datetime.enabled && config.datetime.position === 'bottom'">
+          {{ item.created_time }}
+        </div>
+        <div class="hivemind-post-info" v-if="config.engagement === 'basic'">
+          <span
+            class="hivemind-post-info-item"
+            v-for="(icon, key) in engagements.basic"
+            :key="key"
+            :title="key">
+            <i class="material-icons" v-text="icon"></i>
+            {{ item[key] | shortnum }}
+          </span>
+        </div>
+        <div class="hivemind-post-info" v-if="config.engagement === 'reactions'">
+          <span
+            class="hivemind-post-info-item"
+            v-for="(icon, key) in engagements.reactions"
+            :key="key"
+            :title="key">
+            <i class="material-icons" v-text="icon"></i>
+            {{ item.reactions[key] | shortnum }}
+          </span>
+        </div>
       </div>
-    </div>
-    <div class="hivemind-footer" v-if="!config.title || media === 'xs'">
-      <a class="hivemind-brand" :href="brand.url" :target="brand.target">
-        <img :src="brand.img" :alt="brand.alt">
-      </a>
-    </div>
-  </div>
+    </li>
+  </ul>
 </template>
 
 <script>
-  import Widget from './Widget.vue'
-
   export default {
-    name: 'content',
-    extends: Widget,
+    name: 'stories',
     props: [
-      'limit',
-      'thumb',
-      'target',
-      'datetime',
-      'engagement',
-      'optimizer',
-      'overflow',
-      'columnXs',
-      'columnSm',
-      'columnMd',
-      'columnLg',
-      'column',
-      'hikeid'
+      'widget',
+      'stories',
+      'summaries',
+      'screen'
     ],
     data () {
       return {
-        items: []
+        engagements: {
+          basic: {
+            likes: 'thumb_up',
+            comments: 'forum',
+            shares: 'share',
+            clicks: 'touch_app'
+          },
+          reactions: {
+            love: 'favorite',
+            haha: 'mood',
+            wow: 'mood_bad',
+            sad: 'sentiment_dissatisfied',
+            angry: 'sentiment_very_dissatisfied'
+          }
+        }
       }
     },
     computed: {
       config () {
-        let results = this.settings
+        let results = this.widget.options
 
         results.link = {
           style: {
@@ -125,7 +86,7 @@
 
         results.thumb = {
           value: results.thumb,
-          enabled: ['left', 'top'].indexOf(results.thumb) !== -1
+          enabled: ['left', 'top', 'left-first', 'top-first'].indexOf(results.thumb) !== -1
         }
 
         if (results.thumb.enabled) {
@@ -139,11 +100,11 @@
         }
 
         results.col = {
-          df: results.column === parseInt(results.column) ? results.column : undefined,
-          xs: results.columnXs === parseInt(results.columnXs) ? results.columnXs : undefined,
-          sm: results.columnSm === parseInt(results.columnSm) ? results.columnSm : undefined,
-          md: results.columnMd === parseInt(results.columnMd) ? results.columnMd : undefined,
-          lg: results.columnLg === parseInt(results.columnLg) ? results.columnLg : undefined
+          df: parseInt(results.column) || undefined,
+          xs: parseInt(results.columnXs) || undefined,
+          sm: parseInt(results.columnSm) || undefined,
+          md: parseInt(results.columnMd) || undefined,
+          lg: parseInt(results.columnLg) || undefined
         }
 
         results.posts = {
@@ -157,7 +118,8 @@
 
         results.datetime = {
           value: results.datetime,
-          enabled: ['sd', 'ld', 'st', 'lt', 'rv'].indexOf(results.datetime) !== -1
+          enabled: ['sd', 'ld', 'st', 'lt', 'rv'].indexOf(results.datetime) !== -1,
+          position: results.datetimePosition || 'top'
         }
 
         results.optimizer = results.optimizer === 'yes'
@@ -168,7 +130,7 @@
         let cfg = this.config.col
         let col = 1
 
-        switch (this.media) {
+        switch (this.screen) {
           case 'lg':
             col = cfg.lg || cfg.df || 1
             break
@@ -184,44 +146,16 @@
         }
 
         return {
-          widget: {
-            class: ['hivemind-widget', 'hivemind-widget-' + this.media]
-          },
           post: {
             style: {
               'width': ( 100 / col ) + '%'
             }
           }
         }
-      }
-    },
-    methods: {
-      fetchContents (token) {
-        let filter = {
-          $board: this.config.hiveid,
-          $dateformat: this.config.datetime.value
-        }
-
-        if (this.config.limit) {
-          filter.$limit = this.config.limit
-        }
-
-        this.$api.request({
-          method: 'get',
-          url: 'contents',
-          params: filter,
-          headers: {
-            authorization: token
-          }
-        }).then((response) => {
-          this.fillContents(response.data.data)
-        }).catch((error) => {
-          this.error = error.message
-        }).then(() => {
-          this.loading = false
-        })
       },
-      fillContents (posts) {
+      items () {
+        let posts = this.stories
+
         // format posts data
         for (let i = 0; i < posts.length; i++) {
           let post = posts[i]
@@ -278,12 +212,16 @@
           }
 
           // add analytics parameters
+          let redirect = 'https://api.hivemind.id/widgets/' + this.widget._id + '/redirect?url='
           let utm = post.link.indexOf('?') === -1 ? '?' : '&'
           post.link += utm + 'utm_source=hivemind.id&utm_medium=widget'
+          post.link = redirect + post.link
         }
 
-        this.items = posts
-      },
+        return posts
+      }
+    },
+    methods: {
       thumbLoaded (e) {
         let img = e.target
         let isLoaded = img.complete && img.naturalHeight > 1
@@ -296,14 +234,6 @@
         let img = e.target
         img.src = this.config.thumb.error
       }
-    },
-    mounted () {
-      this.authenticate().then((response) => {
-        this.fetchContents(response.data.accessToken)
-      }).catch((error) => {
-        this.error = error.message
-        this.loading = false
-      })
     }
   }
 </script>
@@ -339,13 +269,19 @@
     max-width: 100%;
   }
   .hivemind-posts-list .hivemind-post-thumb {
-    float: left;
-    margin-right: 15px;
+    width: 80px;
+    display: table-cell;
+    vertical-align: top;
+    padding-right: 15px;
   }
   .hivemind-posts-list img {
-    width: 65px;
-    height: 65px;
+    width: 100%;
+    height: auto;
     margin: 0;
+  }
+  .hivemind-posts-list .hivemind-post-content {
+    display: table-cell;
+    vertical-align: top;
   }
   .hivemind-posts-card .hivemind-post-thumb {
     margin-bottom: 7px;
