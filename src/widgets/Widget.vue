@@ -1,12 +1,6 @@
 <template>
   <div :class="css.widget.class">
-    <div class="hivemind-loading" v-if="loading">
-      <spinner
-        spacing="25"
-        message="loading.."
-        line-fg-color="#059B85"
-        font-size="16"></spinner>
-    </div>
+    <spinner v-if="loading"></spinner>
     <template v-else>
       <error v-if="error" :message="error"></error>
       <template v-else>
@@ -35,7 +29,7 @@
 </template>
 
 <script>
-  import Spinner from 'vue-simple-spinner'
+  import Spinner from '../components/Spinner.vue'
   import Error from '../components/Error.vue'
   import Stories from '../components/Stories.vue'
   import Summary from '../components/Summary.vue'

@@ -1,7 +1,7 @@
 <script>
   import Api from '../libraries/api'
   import Error from './Error.vue'
-  import Spinner from 'vue-simple-spinner'
+  import Spinner from './Spinner.vue'
 
   export default {
     components: {

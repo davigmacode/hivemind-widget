@@ -7,9 +7,7 @@
       <h3 class="hivemind-title" v-text="settings.title"></h3>
     </div>
     <div class="hivemind-body">
-      <div class="hivemind-loading" v-if="loading">
-        <spinner :spacing="10" message="loading"></spinner>
-      </div>
+      <spinner v-if="loading"></spinner>
       <div class="hivemind-content" v-else>
         <error v-if="error" :message="error"></error>
         <div class="hivemind-chart" v-else>

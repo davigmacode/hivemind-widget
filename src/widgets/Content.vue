@@ -7,9 +7,7 @@
       <h3 class="hivemind-title" v-text="config.title"></h3>
     </div>
     <div class="hivemind-body">
-      <div class="hivemind-loading" v-if="loading">
-        <spinner :spacing="10" :line-fg-color="config.color" message="loading"></spinner>
-      </div>
+      <spinner v-if="loading"></spinner>
       <div class="hivemind-content" v-else>
         <error v-if="error" :message="error"></error>
         <ul :class="config.posts.class" v-else>
