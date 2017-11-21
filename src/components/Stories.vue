@@ -76,7 +76,7 @@
     },
     computed: {
       config () {
-        let results = this.widget.options
+        let results = Object.assign({}, this.widget.options)
 
         results.link = {
           style: {
