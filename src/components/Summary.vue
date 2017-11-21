@@ -45,7 +45,4 @@
 </script>
 
 <style scoped>
-  .hivemind-chart {
-    background: #fff;
-  }
 </style>

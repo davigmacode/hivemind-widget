@@ -103,7 +103,11 @@
       css () {
         return {
           widget: {
-            class: ['hivemind-widget', 'hivemind-widget-' + this.screen]
+            class: [
+              'hivemind-widget',
+              'hivemind-widget-' + this.widget.type,
+              'hivemind-widget-' + this.screen
+            ]
           }
         }
       }

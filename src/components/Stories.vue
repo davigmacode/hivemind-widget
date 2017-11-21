@@ -244,7 +244,6 @@
     margin: 0;
     list-style: none;
     border-bottom: 1px solid #ddd;
-    background-color: #fff;
     text-align: left;
   }
   .hivemind-post {
