@@ -94,8 +94,8 @@
             results.thumb.placeholder = 'https://via.placeholder.com/80?text=not%20found'
             results.thumb.error = 'https://via.placeholder.com/80?text=broken'
           } else if (results.thumb.value === 'top') {
-            results.thumb.placeholder = 'https://via.placeholder.com/500x300?text=not%20found'
-            results.thumb.error = 'https://via.placeholder.com/500x300?text=broken'
+            results.thumb.placeholder = 'https://via.placeholder.com/400x250?text=not%20found'
+            results.thumb.error = 'https://via.placeholder.com/400x250?text=broken'
           }
         }
 
@@ -171,20 +171,7 @@
             } else if (this.config.thumb.value === 'top' && post.full_picture) {
               let pic = post.full_picture
               if (this.config.optimizer) {
-                let result = null
-                if (pic.indexOf('scontent.xx.fbcdn.net') >= 0) {
-                  result = pic.replace(/^\/\/|^.*?:\/\//, '')
-                  result = 'http://rsz.io/' + result + '?w=500&h=300&mode=crop'
-                } else if (pic.indexOf('external.xx.fbcdn.net') >= 0) {
-                  let url = new URL(pic)
-                  let params = new URLSearchParams(url.search.slice(1))
-                  result = params.get('url')
-                  result = result.replace(/^\/\/|^.*?:\/\//, '')
-                  result = 'http://rsz.io/' + result + '?w=500&h=300&mode=crop'
-                } else {
-                  result = this.config.thumb.placeholder
-                }
-                post.thumb = result
+                post.thumb = `https://cdn.hivemind.id/image/facebook/${post._id}?w=400&h=250`
               } else {
                 post.thumb = pic
               }
