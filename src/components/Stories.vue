@@ -233,6 +233,11 @@
         let img = e.target
         img.src = this.config.thumb.error
       }
+    },
+    mounted () {
+      if (window.MTBADVS) {
+        window.MTBADVS.InStream.Default.run({"immediately":true})
+      }
     }
   }
 </script>
@@ -242,15 +247,13 @@
     padding: 0;
     margin: 0;
     list-style: none;
-    border-bottom: 1px solid #ddd;
     text-align: left;
   }
   .hivemind-post {
     position: relative;
     display: block;
     margin: 0;
-    padding: 12px 10px;
-    border-top: 1px solid #ddd;
+    padding: 7px 0px;
     text-align: left;
     box-sizing: border-box;
     background: none;
