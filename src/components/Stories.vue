@@ -1,48 +1,57 @@
 <template>
   <ul :class="config.posts.class">
-    <li class="hivemind-post" :style="css.post.style" v-for="item in items" :key="item._id">
-      <div class="hivemind-post-thumb" v-if="config.thumb.enabled">
-        <a
-          :target="config.target"
-          :href="item.link">
-          <img :src="item.thumb" @load="thumbLoaded" @error="thumbError">
-        </a>
-      </div>
-      <div class="hivemind-post-content">
-        <div class="hivemind-post-date" v-if="config.datetime.enabled && config.datetime.position === 'top'">
-          {{ item.created_time }}
+    <template v-if="showHike">
+      <div data-advs-adspot-id="NDkzOjExMjcw" style="display:none"></div>
+      <div data-advs-adspot-id="NDkzOjExMjcw" style="display:none"></div>
+    </template>
+    <template v-for="(item, index) in items">
+      <li class="hivemind-post" :style="css.post.style" :key="item._id">
+        <div class="hivemind-post-thumb" v-if="config.thumb.enabled">
+          <a
+            :target="config.target"
+            :href="item.link">
+            <img :src="item.thumb" @load="thumbLoaded" @error="thumbError">
+          </a>
         </div>
-        <a
-          class="hivemind-post-link"
-          v-text="item.title"
-          :href="item.link"
-          :target="config.target"
-          :style="config.link.style"></a>
-        <div class="hivemind-post-date" v-if="config.datetime.enabled && config.datetime.position === 'bottom'">
-          {{ item.created_time }}
+        <div class="hivemind-post-content">
+          <div class="hivemind-post-date" v-if="config.datetime.enabled && config.datetime.position === 'top'">
+            {{ item.created_time }}
+          </div>
+          <a
+            class="hivemind-post-link"
+            v-text="item.title"
+            :href="item.link"
+            :target="config.target"
+            :style="config.link.style"></a>
+          <div class="hivemind-post-date" v-if="config.datetime.enabled && config.datetime.position === 'bottom'">
+            {{ item.created_time }}
+          </div>
+          <div class="hivemind-post-info" v-if="config.engagement === 'basic'">
+            <span
+              class="hivemind-post-info-item"
+              v-for="(icon, key) in engagements.basic"
+              :key="key"
+              :title="key">
+              <i class="material-icons" v-text="icon"></i>
+              {{ item[key] | shortnum }}
+            </span>
+          </div>
+          <div class="hivemind-post-info" v-if="config.engagement === 'reactions'">
+            <span
+              class="hivemind-post-info-item"
+              v-for="(icon, key) in engagements.reactions"
+              :key="key"
+              :title="key">
+              <i class="material-icons" v-text="icon"></i>
+              {{ item.reactions[key] | shortnum }}
+            </span>
+          </div>
         </div>
-        <div class="hivemind-post-info" v-if="config.engagement === 'basic'">
-          <span
-            class="hivemind-post-info-item"
-            v-for="(icon, key) in engagements.basic"
-            :key="key"
-            :title="key">
-            <i class="material-icons" v-text="icon"></i>
-            {{ item[key] | shortnum }}
-          </span>
-        </div>
-        <div class="hivemind-post-info" v-if="config.engagement === 'reactions'">
-          <span
-            class="hivemind-post-info-item"
-            v-for="(icon, key) in engagements.reactions"
-            :key="key"
-            :title="key">
-            <i class="material-icons" v-text="icon"></i>
-            {{ item.reactions[key] | shortnum }}
-          </span>
-        </div>
-      </div>
-    </li>
+      </li>
+    </template>
+    <template v-if="showHike">
+      <div data-advs-adspot-id="NDkzOjExMjcw" style="display:none"></div>
+    </template>
   </ul>
 </template>
 
@@ -209,6 +218,9 @@
       }
     },
     methods: {
+      showHike () {
+        return true
+      },
       thumbLoaded (e) {
         let img = e.target
         let isLoaded = img.complete && img.naturalHeight > 1
