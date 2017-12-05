@@ -1,11 +1,12 @@
 <template>
-  <ul :class="config.posts.class">
+  <div :class="config.posts.class">
     <template v-if="showHike">
-      <div data-advs-adspot-id="NDkzOjExMjcw" style="display:none"></div>
-      <div data-advs-adspot-id="NDkzOjExMjcw" style="display:none"></div>
+      <div class="hivemind-post" :style="css.post.style">
+        <div data-advs-adspot-id="NDkzOjExMjcw" style="display:none"></div>
+      </div>
     </template>
     <template v-for="(item, index) in items">
-      <li class="hivemind-post" :style="css.post.style" :key="item._id">
+      <div class="hivemind-post" :style="css.post.style" :key="item._id">
         <div class="hivemind-post-thumb" v-if="config.thumb.enabled">
           <a
             :target="config.target"
@@ -47,12 +48,14 @@
             </span>
           </div>
         </div>
-      </li>
+      </div>
     </template>
     <template v-if="showHike">
-      <div data-advs-adspot-id="NDkzOjExMjcw" style="display:none"></div>
+      <div class="hivemind-post" :style="css.post.style">
+        <div data-advs-adspot-id="NDkzOjExMjcw" style="display:none"></div>
+      </div>
     </template>
-  </ul>
+  </div>
 </template>
 
 <script>
@@ -235,6 +238,10 @@
       }
     },
     mounted () {
+      // emit event widget on reeady
+      this.$emit('ready')
+
+      // run ads from mtburn
       if (window.MTBADVS) {
         window.MTBADVS.InStream.Default.run({"immediately":true})
       }
