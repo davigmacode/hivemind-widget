@@ -1,6 +1,6 @@
 <template>
   <div :class="config.posts.class">
-    <template v-if="showHike">
+    <template v-if="showHike()">
       <div class="hivemind-post" :style="css.post.style">
         <div data-advs-adspot-id="NDkzOjExMjcw" style="display:none"></div>
       </div>
@@ -50,7 +50,7 @@
         </div>
       </div>
     </template>
-    <template v-if="showHike">
+    <template v-if="showHike()">
       <div class="hivemind-post" :style="css.post.style">
         <div data-advs-adspot-id="NDkzOjExMjcw" style="display:none"></div>
       </div>
@@ -222,7 +222,7 @@
     },
     methods: {
       showHike () {
-        return this.screen === 'xs'
+        return this.screen == 'xs'
       },
       thumbLoaded (e) {
         let img = e.target
