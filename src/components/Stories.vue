@@ -4,6 +4,9 @@
       <div class="hivemind-post" :style="css.post.style">
         <div data-advs-adspot-id="NDkzOjExMjcw" style="display:none"></div>
       </div>
+      <div class="hivemind-post" :style="css.post.style">
+        <div data-advs-adspot-id="NDkzOjExMjcw" style="display:none"></div>
+      </div>
     </template>
     <template v-for="(item, index) in items">
       <div class="hivemind-post" :style="css.post.style" :key="item._id">
