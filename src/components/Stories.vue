@@ -4,9 +4,6 @@
       <div class="hivemind-post" :style="css.post.style">
         <div data-advs-adspot-id="NDkzOjExMjcw" style="display:none"></div>
       </div>
-      <div class="hivemind-post" :style="css.post.style">
-        <div data-advs-adspot-id="NDkzOjExMjcw" style="display:none"></div>
-      </div>
     </template>
     <template v-for="(item, index) in items">
       <div class="hivemind-post" :style="css.post.style" :key="item._id">
@@ -258,6 +255,7 @@
     margin: 0;
     list-style: none;
     text-align: left;
+    font-size: 0;
   }
   .hivemind-post {
     position: relative;
@@ -267,6 +265,7 @@
     text-align: left;
     box-sizing: border-box;
     background: none;
+    font-size: 1rem;
   }
   .hivemind-post:after {
     content: "";
@@ -314,7 +313,7 @@
     border: 0;
   }
   .hivemind-post-date {
-    font-size: 85%;
+    font-size: 80%;
     margin-bottom: 3px;
   }
   .hivemind-post-link {
