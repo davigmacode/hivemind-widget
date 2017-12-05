@@ -222,7 +222,7 @@
     },
     methods: {
       showHike () {
-        return true
+        return this.screen === 'xs'
       },
       thumbLoaded (e) {
         let img = e.target
