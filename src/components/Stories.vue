@@ -2,7 +2,7 @@
   <div :class="config.posts.class">
     <template v-if="showHike()">
       <div class="hivemind-post" :style="css.post.style">
-        <div data-advs-adspot-id="NDkzOjExMjcw" style="display:none"></div>
+        <div :data-advs-adspot-id="ads.hike" style="display:none"></div>
       </div>
     </template>
     <template v-for="(item, index) in items">
@@ -52,7 +52,7 @@
     </template>
     <template v-if="showHike()">
       <div class="hivemind-post" :style="css.post.style">
-        <div data-advs-adspot-id="NDkzOjExMjcw" style="display:none"></div>
+        <div :data-advs-adspot-id="ads.hike" style="display:none"></div>
       </div>
     </template>
   </div>
@@ -218,11 +218,14 @@
         }
 
         return posts
+      },
+      ads () {
+        return this.widget.ads || {}
       }
     },
     methods: {
       showHike () {
-        return this.screen == 'xs'
+        return this.screen == 'xs' && this.ads.hike
       },
       thumbLoaded (e) {
         let img = e.target
