@@ -1,12 +1,8 @@
 <template>
   <div :class="config.posts.class">
-    <template v-if="showHike()">
-      <div class="hivemind-post" :style="css.post.style">
-        <div :data-advs-adspot-id="ads.hike" style="display:none"></div>
-      </div>
-    </template>
     <template v-for="(item, index) in items">
-      <div class="hivemind-post" :style="css.post.style" :key="item._id">
+      <div v-if="showHike(index)" :data-advs-adspot-id="ads.hike" :key="index" style="display:none"></div>
+      <div class="hivemind-post" :key="item._id">
         <div class="hivemind-post-thumb" v-if="config.thumb.enabled">
           <a
             :target="config.target"
@@ -48,11 +44,6 @@
             </span>
           </div>
         </div>
-      </div>
-    </template>
-    <template v-if="showHike()">
-      <div class="hivemind-post" :style="css.post.style">
-        <div :data-advs-adspot-id="ads.hike" style="display:none"></div>
       </div>
     </template>
   </div>
@@ -119,12 +110,18 @@
           lg: parseInt(results.columnLg) || undefined
         }
 
+        results.col.current = this.getCurrentColumn(results.col)
+        results.col.enabled = !!results.col.df || !!results.col.xs || !!results.col.sm || !!results.col.md || !!results.col.lg
+
+        let postsColClass = 'hivemind-posts-column-' + results.col.current
+
         results.posts = {
           class: {
             'hivemind-posts': true,
             'hivemind-posts-list': results.thumb.value === 'left',
             'hivemind-posts-card': results.thumb.value === 'top',
-            'hivemind-posts-column': !!results.col.df || !!results.col.xs || !!results.col.sm || !!results.col.md || !!results.col.lg
+            'hivemind-posts-column': results.col.enabled,
+            [postsColClass]: true
           }
         }
 
@@ -140,22 +137,7 @@
       },
       css () {
         let cfg = this.config.col
-        let col = 1
-
-        switch (this.screen) {
-          case 'lg':
-            col = cfg.lg || cfg.df || 1
-            break
-          case 'md':
-            col = cfg.md || cfg.lg || cfg.df || 1
-            break
-          case 'sm':
-            col = cfg.sm || cfg.md || cfg.lg || cfg.df || 1
-            break
-          case 'xs':
-            col = cfg.xs || cfg.sm || cfg.md || cfg.lg || cfg.df || 1
-            break
-        }
+        let col = this.getCurrentColumn(cfg)
 
         return {
           post: {
@@ -224,8 +206,10 @@
       }
     },
     methods: {
-      showHike () {
-        return this.screen == 'xs' && this.ads.hike
+      showHike (index) {
+        console.log(this.screen)
+        let order = [0, 1, 2].indexOf(index) !== -1
+        return this.screen == 'xs' && this.ads.hike && order
       },
       thumbLoaded (e) {
         let img = e.target
@@ -238,14 +222,34 @@
       thumbError (e) {
         let img = e.target
         img.src = this.config.thumb.error
+      },
+      getCurrentColumn(cfg) {
+        let col = 1
+
+        switch (this.screen) {
+          case 'lg':
+            col = cfg.lg || cfg.df || 1
+            break
+          case 'md':
+            col = cfg.md || cfg.lg || cfg.df || 1
+            break
+          case 'sm':
+            col = cfg.sm || cfg.md || cfg.lg || cfg.df || 1
+            break
+          case 'xs':
+            col = cfg.xs || cfg.sm || cfg.md || cfg.lg || cfg.df || 1
+            break
+        }
+
+        return col
       }
     },
     mounted () {
       // emit event widget on reeady
       this.$emit('ready')
 
-      // run ads from mtburn
-      if (window.MTBADVS) {
+      // run ads from hike mtburn
+      if (this.ads.hike && window.MTBADVS) {
         window.MTBADVS.InStream.Default.run({"immediately":true})
       }
     }
@@ -345,5 +349,29 @@
     font-size: 100%;
     opacity: .5;
     top: 2px;
+  }
+  .hivemind-posts-column-2 .hivemind-post {
+    width: 50%;
+  }
+  .hivemind-posts-column-3 .hivemind-post {
+    width: 33.33%;
+  }
+  .hivemind-posts-column-4 .hivemind-post {
+    width: 25%;
+  }
+  .hivemind-posts-column-5 .hivemind-post {
+    width: 20%;
+  }
+  .hivemind-posts-column-6 .hivemind-post {
+    width: 16.6666667%;
+  }
+  .hivemind-posts-column-7 .hivemind-post {
+    width: 14.2857143%;
+  }
+  .hivemind-posts-column-8 .hivemind-post {
+    width: 12.5%;
+  }
+  .hivemind-posts-column-9 .hivemind-post {
+    width: 11.1111111%;
   }
 </style>
