@@ -1,7 +1,7 @@
 <template>
   <div :class="config.posts.class">
     <template v-for="(item, index) in items">
-      <div v-if="showHike(index)" :data-advs-adspot-id="ads.hike" :key="index" style="display:none"></div>
+      <div v-if="showHike(index)" :data-rfp-adspot-id="ads.hike" :key="index" style="display:none"></div>
       <div class="hivemind-post" :key="item._id">
         <div class="hivemind-post-thumb" v-if="config.thumb.enabled">
           <a
