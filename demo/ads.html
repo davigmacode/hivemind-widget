@@ -1,0 +1,51 @@
+<!DOCTYPE HTML>
+<html lang="en-us">
+  <head>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+    <title>Widgets Magazine</title>
+    <script>
+      var googletag = googletag || {};
+      googletag.cmd = googletag.cmd || [];
+      (function() {
+        var gads = document.createElement('script');
+        gads.async = true;
+        var useSSL = 'https:' == document.location.protocol;
+        gads.src = (useSSL ? 'https:' : 'http:') +
+            '//www.googletagservices.com/tag/js/gpt.js';
+        var node = document.getElementsByTagName('script')[0];
+        node.parentNode.insertBefore(gads, node);
+
+        googletag.cmd.push(function() {
+          googletag.defineSlot('/75471002/hmw-5a14fcd1dbc69100c48f6681', 'fluid', 'div-gpt-ad-1529991946489-0').addService(googletag.pubads());
+          googletag.pubads().enableSingleRequest();
+          googletag.pubads().collapseEmptyDivs();
+          googletag.enableServices();
+        });
+      })();
+    </script>
+    <script>
+      var eventMethod = window.addEventListener ? "addEventListener" : "attachEvent";
+      var eventer = window[eventMethod];
+      var messageEvent = eventMethod == "attachEvent" ? "onmessage" : "message";
+
+      // Listen to message from child window
+      eventer(messageEvent, function (e) {
+        var key = e.message ? "message" : "data";
+        var data = e[key];
+        var eventName = data.message || 'ignore';
+
+        if (eventName == 'dfpa') {
+          console.log('ad data available: ', data);
+        }
+      }, false);
+    </script>
+  </head>
+  <body>
+    <!-- /75471002/hmw-5a14fcd1dbc69100c48f6681 -->
+    <div id='div-gpt-ad-1529991946489-0'>
+      <script>
+        googletag.cmd.push(function() { googletag.display('div-gpt-ad-1529991946489-0'); });
+      </script>
+    </div>
+  </body>
+</html>

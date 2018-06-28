@@ -1,5 +1,28 @@
 <template>
   <div :class="config.posts.class">
+    <div v-if="dfp.content" class="hivemind-post">
+      <div class="hivemind-post-thumb" v-if="config.thumb.enabled">
+        <a
+          :target="config.target"
+          :href="dfp.content.link">
+          <img :src="dfp.content.thumbnail" @load="thumbLoaded" @error="thumbError">
+        </a>
+      </div>
+      <div class="hivemind-post-content">
+        <div class="hivemind-post-date" v-if="config.datetime.position === 'top'">
+          {{ dfp.content.brand }}
+        </div>
+        <a
+          class="hivemind-post-link"
+          v-text="dfp.content.headline"
+          :href="dfp.content.link"
+          :target="config.target"
+          :style="config.link.style"></a>
+        <div class="hivemind-post-date" v-if="config.datetime.position === 'bottom'">
+          {{ dfp.content.brand }}
+        </div>
+      </div>
+    </div>
     <template v-for="(item, index) in items">
       <div v-if="showHike(index)" :data-rfp-adspot-id="ads.hike" :key="index" style="display:none"></div>
       <div class="hivemind-post" :key="item._id">
@@ -46,6 +69,7 @@
         </div>
       </div>
     </template>
+    <div :id="dfp.target"></div>
   </div>
 </template>
 
@@ -74,6 +98,11 @@
             sad: 'sentiment_dissatisfied',
             angry: 'sentiment_very_dissatisfied'
           }
+        },
+        dfp: {
+          unit: '/75471002/hmw-' + this.widget._id,
+          target: 'hivemind-dfp-0',
+          content: false
         }
       }
     },
@@ -207,9 +236,45 @@
     },
     methods: {
       showHike (index) {
-        console.log(this.screen)
+        // console.log(this.screen)
         let order = [0, 1, 2].indexOf(index) !== -1
         return this.screen == 'xs' && this.ads.hike && order
+      },
+      dfpInit ({ unit, target }) {
+        window.googletag = window.googletag || {}
+        window.googletag.cmd = window.googletag.cmd || []
+
+        var gads = document.createElement('script')
+        var useSSL = 'https:' == document.location.protocol
+        var node = document.getElementsByTagName('script')[0]
+
+        gads.async = true
+        gads.src = (useSSL ? 'https:' : 'http:') + '//www.googletagservices.com/tag/js/gpt.js'
+        node.parentNode.insertBefore(gads, node)
+
+        window.googletag.cmd.push(function () {
+          window.googletag.defineSlot(unit, 'fluid', target).addService(window.googletag.pubads());
+          window.googletag.pubads().enableSingleRequest()
+          window.googletag.pubads().collapseEmptyDivs()
+          window.googletag.enableServices()
+          window.googletag.display(target)
+        })
+      },
+      dfpEvent () {
+        var eventMethod = window.addEventListener ? 'addEventListener' : 'attachEvent'
+        var eventer = window[eventMethod]
+        var messageEvent = eventMethod == 'attachEvent' ? 'onmessage' : 'message'
+
+        // Listen to message from child window
+        eventer(messageEvent, (e) => {
+          var key = e.message ? 'message' : 'data'
+          var data = e[key]
+          var eventName = data.message || 'ignore'
+
+          if (eventName == 'dfpa' && data.unit == this.dfp.unit) {
+            this.$set(this.dfp, 'content', data.content)
+          }
+        }, false)
       },
       thumbLoaded (e) {
         let img = e.target
@@ -250,8 +315,14 @@
 
       // run ads from hike mtburn
       if (this.ads.hike && window.MTBADVS) {
-        window.MTBADVS.InStream.Default.run({"immediately":true})
+        window.MTBADVS.InStream.Default.run({'immediately': true})
       }
+
+      this.dfpEvent()
+      this.dfpInit({
+        unit: this.dfp.unit,
+        target: this.dfp.target
+      })
     }
   }
 </script>
